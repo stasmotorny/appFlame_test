@@ -12,7 +12,7 @@ interface IProps {
 
 export function UserItem(props: IProps) {
     const {item, onRemove, onPress} = props;
-    const {avatar, name, id, age} = item;
+    const {avatar, name, id, age, isLiked} = item;
 
     const handleRemove = useCallback(() => onRemove?.(item.id), [item, onRemove]);
 
@@ -22,11 +22,13 @@ export function UserItem(props: IProps) {
         () => (
             <View>
                 <View>
-                    <Image style={{width: 25, height: 25}} source={require('../../../assets/heart_red.png')} />
+                    {isLiked ? (
+                        <Image style={{width: 25, height: 25}} source={require('../../../assets/heart_red.png')} />
+                    ) : null}
                 </View>
             </View>
         ),
-        [],
+        [isLiked],
     );
 
     const renderDescription = useCallback(

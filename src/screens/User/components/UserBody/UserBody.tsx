@@ -1,19 +1,24 @@
-import React, {useCallback} from 'react';
-import {Image, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Image, Pressable, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
-import {TUser} from '../../../../app/API';
 import {getUser} from '../../../../app/selectors/users';
 import {RootState} from '../../../../app/store';
 import {ImagePlaceholder} from '../../../Home/components/ImagePlaceholder/ImagePlaceholder';
 import styles from './styles';
+import {useAppDispatch} from "../../../../app/hooks";
+import {likeUser} from "../../../../app/actions/users";
 
 export type TUserBodyProps = {
     id: number;
 };
 
 const UserBody = ({id: userId}: TUserBodyProps) => {
-    const item = useSelector((state: RootState) => getUser(state, userId));
-    const {avatar, name, id, age} = item;
+    const dispatch = useAppDispatch();
+    const items = useSelector((state: RootState) => state);
+
+    const item = getUser(items, userId);
+
+    const {avatar, name, id, age, isLiked} = item!;
 
     const renderDescription = useCallback(
         () => (
@@ -25,6 +30,10 @@ const UserBody = ({id: userId}: TUserBodyProps) => {
         ),
         [age, id, name],
     );
+
+    const onLikePress = (userId: number) => {
+        dispatch(likeUser(userId));
+    };
 
     const renderImage = useCallback(
         () => (
@@ -39,15 +48,24 @@ const UserBody = ({id: userId}: TUserBodyProps) => {
                             width: 40,
                             height: 40,
                         }}>
-                        <Image
-                            style={{width: 40, height: 40, opacity: 1}}
-                            source={require('../../../../assets/heart_red.png')}
-                        />
+                        <Pressable onPress={() => {onLikePress(id)}}>
+                            {isLiked ? (
+                                <Image
+                                    style={{width: 40, height: 40, opacity: 1}}
+                                    source={require('../../../../assets/heart_red.png')}
+                                />
+                            ) : (
+                                <Image
+                                    style={{width: 40, height: 40, opacity: 1}}
+                                    source={require('../../../../assets/heart_black.png')}
+                                />
+                            )}
+                        </Pressable>
                     </View>
                 </View>
             </>
         ),
-        [avatar],
+        [avatar, isLiked],
     );
 
     const renderBody = useCallback(() => {
